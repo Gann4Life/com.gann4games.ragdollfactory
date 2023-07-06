@@ -1,6 +1,6 @@
 # CollisionBuilder
 Build unity collisions easily by just clicking on the bones you want collisions in.
-
+### Made in Unity 2021.3.20f1 - Can't guarantee it works on other versions.
 ## Getting started
 * To begin creating collisions, right click on your skeleton's root bone or the master parent and look for the `MrGann > Collision Builder` item in the menu.
 
