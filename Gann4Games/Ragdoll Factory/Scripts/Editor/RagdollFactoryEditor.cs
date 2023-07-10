@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Windows;
 
 namespace Gann4Games.RagdollFactory
 {
@@ -29,11 +30,25 @@ namespace Gann4Games.RagdollFactory
         private SerializedProperty _jointYLimit;
         private SerializedProperty _jointZAngle;
         // Rigidbody settings
+        private SerializedProperty _rigidbodyMass;
+        private SerializedProperty _rigidbodyDrag;
+        private SerializedProperty _rigidbodyAngularDrag;
+        private SerializedProperty _rigidbodyUseGravity;
+        private SerializedProperty _rigidbodyIsKinematic;
 
         #endregion
 
-        private int _componentToCreate = 0;
-        private int _componentMode = 0;
+        #region Icon paths
+        private string iconAddPath = "Assets/Gann4Games/Ragdoll Factory/Content/Icons/Actions/add.png";
+        private string iconSelectPath = "Assets/Gann4Games/Ragdoll Factory/Content/Icons/Actions/select.png";
+        private string iconDeletePath = "Assets/Gann4Games/Ragdoll Factory/Content/Icons/Actions/delete.png";
+        private string iconCapsulePath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/capsule.png";
+        private string iconBoxPath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/box.png";
+        private string iconJointPath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/joint.png";
+        private string iconRigidbodyPath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/rigidbody.png";
+
+        private Texture2D iconAdd, iconSelect, iconDelete, iconCapsule, iconBox, iconJoint, iconRigidbody;
+        #endregion
         
         private void OnEnable()
         {
@@ -45,6 +60,24 @@ namespace Gann4Games.RagdollFactory
             if (!Instance)
                 Instance = this;
 
+            ApplySerializedProperties();
+            LoadButtonIcons();
+        }
+
+        private void LoadButtonIcons()
+        {
+            int iconSize = 5;
+            iconAdd = EditorGUIUtility.Load(iconAddPath) as Texture2D;
+            iconSelect = EditorGUIUtility.Load(iconSelectPath) as Texture2D;
+            iconDelete = EditorGUIUtility.Load(iconDeletePath) as Texture2D;
+            iconCapsule = EditorGUIUtility.Load(iconCapsulePath) as Texture2D;
+            iconBox = EditorGUIUtility.Load(iconBoxPath) as Texture2D;
+            iconJoint = EditorGUIUtility.Load(iconJointPath) as Texture2D;
+            iconRigidbody = EditorGUIUtility.Load(iconRigidbodyPath) as Texture2D;
+        }
+
+        private void ApplySerializedProperties()
+        {
             _capsuleRadius = serializedObject.FindProperty("capsuleColliderRadius");
             _capsuleLength = serializedObject.FindProperty("capsuleColliderLength");
 
@@ -57,6 +90,12 @@ namespace Gann4Games.RagdollFactory
             _jointHighXLimit = serializedObject.FindProperty("jointHighXLimit");
             _jointYLimit = serializedObject.FindProperty("jointYLimit");
             _jointZAngle = serializedObject.FindProperty("jointZLimit");
+            
+            _rigidbodyMass = serializedObject.FindProperty("rigidbodyMass");
+            _rigidbodyDrag = serializedObject.FindProperty("rigidbodyDrag");
+            _rigidbodyAngularDrag = serializedObject.FindProperty("rigidbodyAngularDrag");
+            _rigidbodyUseGravity = serializedObject.FindProperty("rigidbodyUseGravity");
+            _rigidbodyIsKinematic = serializedObject.FindProperty("rigidbodyIsKinematic");
         }
 
         // Draw inspector
@@ -65,11 +104,33 @@ namespace Gann4Games.RagdollFactory
             // base.OnInspectorGUI();
             DrawHelpBox();
             serializedObject.Update();
-            DrawInspectorHeader();
+            DrawInspectorTabs();
             DrawCurrentComponentProperties();
             serializedObject.ApplyModifiedProperties();
         }
 
+        private void DrawInspectorTabs()
+        {
+            GUIContent[] componentTabs = {
+                new(iconCapsule, "Capsule colliders tab"),
+                new(iconBox, "Box colliders tab"),
+                new(iconJoint, "Configurable Joints tab"),
+                new(iconRigidbody, "Rigidbodies tab")
+            };
+            
+            GUIContent[] actionTypeTabs = {
+                new(iconAdd, "Create"),
+                new(iconSelect, "Select"),
+                new(iconDelete, "Delete")
+            };
+            
+            _target.componentType = (RagdollFactory.ComponentType)GUILayout.Toolbar((int)_target.componentType, componentTabs);
+            _target.actionTypeOnClick = (RagdollFactory.ActionTypeOnClick)GUILayout.Toolbar((int)_target.actionTypeOnClick, actionTypeTabs);
+            
+            GUILayout.Space(15);
+        }
+        
+        #region Property Drawing
         private void DrawCurrentComponentProperties()
         {
             switch (_target.componentType)
@@ -83,23 +144,22 @@ namespace Gann4Games.RagdollFactory
                 case RagdollFactory.ComponentType.ConfigurableJoint:
                     DrawJointProperties();
                     break;
+                case RagdollFactory.ComponentType.Rigidbody:
+                    DrawRigidbodyProperties();
+                    break;
             }
         }
-
-        private void DrawInspectorHeader()
+        private void DrawRigidbodyProperties()
         {
-            _target.componentType = (RagdollFactory.ComponentType)GUILayout.Toolbar((int)_target.componentType, new string[]
-            {
-                "Capsule", "Box", "Joint", "Rigidbody"
-            });
+            EditorGUILayout.PropertyField(_rigidbodyMass);
+            EditorGUILayout.PropertyField(_rigidbodyDrag);
+            EditorGUILayout.PropertyField(_rigidbodyAngularDrag);
+            EditorGUILayout.PropertyField(_rigidbodyUseGravity);
+            EditorGUILayout.PropertyField(_rigidbodyIsKinematic);
             
-            _target.actionTypeOnClick = (RagdollFactory.ActionTypeOnClick)GUILayout.Toolbar((int)_target.actionTypeOnClick, new string[]
-            {
-                "Create", "Select", "Delete"
-            });
-            GUILayout.Space(15);
+            if(GUILayout.Button("Delete Rigidbody"))
+                _target.DeleteSelectedRigidbody();
         }
-
         private void DrawJointProperties()
         {
             EditorGUILayout.PropertyField(_jointAxis);
@@ -109,10 +169,7 @@ namespace Gann4Games.RagdollFactory
             EditorGUILayout.PropertyField(_jointZAngle);
 
             if (GUILayout.Button("Delete Joint"))
-            {
                 _target.DeleteSelectedJoint();
-                // _target.DeleteSelectedRigidbody();
-            }
         }
         private void DrawCapsuleColliderProperties()
         {
@@ -126,7 +183,6 @@ namespace Gann4Games.RagdollFactory
                 _target.DeleteSelectedCollider();
             EditorGUILayout.EndHorizontal();
         }
-
         private void DrawBoxColliderProperties()
         {
             EditorGUILayout.PropertyField(_boxLength);
@@ -140,6 +196,7 @@ namespace Gann4Games.RagdollFactory
                 _target.DeleteSelectedCollider();
             EditorGUILayout.EndHorizontal();
         }
+        #endregion
 
         /// <summary>
         /// Shows relevant information about how to perfom a specific action in the choosen tool/button/mode
@@ -183,8 +240,13 @@ namespace Gann4Games.RagdollFactory
                     
                     break;
                 case RagdollFactory.ComponentType.Rigidbody:
-                    messageType = MessageType.Warning;
-                    message += "Rigidbodies not supported yet.";
+                    // messageType = MessageType.Warning;
+                    if (_target.actionTypeOnClick == RagdollFactory.ActionTypeOnClick.Create)
+                        message += "Click on a bone to create a rigidbody on it.";
+                    else if (_target.actionTypeOnClick == RagdollFactory.ActionTypeOnClick.Select)
+                        message += "Click on a rigidbody to edit its properties.";
+                    else if (_target.actionTypeOnClick == RagdollFactory.ActionTypeOnClick.Delete)
+                        message += "Click on a rigidbody delete it.";
                     break;
             }
             EditorGUILayout.HelpBox(message, messageType);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
-using UnityEngine.Serialization;
 
 namespace Gann4Games.RagdollFactory
 {
@@ -35,13 +34,19 @@ namespace Gann4Games.RagdollFactory
         public float boxColliderLength;
         
         // Joint settings
-        public Vector3 jointAxis;
-        [Range(0, 180)] public float jointLowXLimit = 20;
-        [Range(0, 180)] public float jointHighXLimit = 20;
-        [Range(0, 180)] public float jointYLimit = 20;
-        [Range(0, 180)] public float jointZLimit = 20;
-        
+        public Vector3 jointAxis = new(1, 0, 0);
+        [Range(0, 180)] public float jointLowXLimit = 0;
+        [Range(0, 180)] public float jointHighXLimit = 0;
+        [Range(0, 180)] public float jointYLimit = 0;
+        [Range(0, 180)] public float jointZLimit = 0;
+
         // Rigidbody settings
+        public float rigidbodyMass = 1;
+        public float rigidbodyDrag = 0;
+        public float rigidbodyAngularDrag = 0.05f;
+        public bool rigidbodyUseGravity = true;
+        public bool rigidbodyIsKinematic = false;
+        
         [Header("Gizmos Settings")]
         public bool showGizmos = true;
         public bool showNames = false;
@@ -174,12 +179,6 @@ namespace Gann4Games.RagdollFactory
             return Vector3.Dot(dirTowardsObj, _mouseRay.direction);
         }
 
-        private float CursorSelectionAccuracy(Vector3 position)
-        {
-            Vector3 dirTowardsObj = (position - _mouseRay.origin).normalized;
-            return Vector3.Dot(dirTowardsObj, _mouseRay.direction);
-        }
-
         /// <summary>
         /// Checks if the given object is one of the closest from all the supported types.
         /// </summary>
@@ -197,7 +196,8 @@ namespace Gann4Games.RagdollFactory
             switch (actionTypeOnClick)
             {
                 case ActionTypeOnClick.Create:
-                    if(!IsFirstBoneSelected) SelectFirstBone();
+                    bool useFirstBone = componentType != ComponentType.Rigidbody && !IsFirstBoneSelected;
+                    if(useFirstBone) SelectFirstBone();
                     else
                     {
                         SelectSecondBone();
@@ -226,6 +226,9 @@ namespace Gann4Games.RagdollFactory
                     break;
                 case ComponentType.ConfigurableJoint:
                     DeleteSelectedJoint();
+                    break;
+                case ComponentType.Rigidbody:
+                    DeleteSelectedRigidbody();
                     break;
             }
         }
@@ -259,7 +262,26 @@ namespace Gann4Games.RagdollFactory
                 case ComponentType.ConfigurableJoint:
                     SelectJoint();
                     break;
+                case ComponentType.Rigidbody:
+                    SelectRigidbody();
+                    break;
             }
+        }
+
+        private void SelectRigidbody()
+        {
+            Rigidbody closestRigidbody = ClosestRigidbodyToCursor();
+            if(closestRigidbody == null)
+                return;
+            
+            LastSelectedRigidbody = closestRigidbody;
+            
+            // Obtain original values
+            rigidbodyMass = closestRigidbody.mass;
+            rigidbodyDrag = closestRigidbody.drag;
+            rigidbodyAngularDrag = closestRigidbody.angularDrag;
+            rigidbodyUseGravity = closestRigidbody.useGravity;
+            rigidbodyIsKinematic = closestRigidbody.isKinematic;
         }
 
         private void SelectJoint()
@@ -273,8 +295,8 @@ namespace Gann4Games.RagdollFactory
             
             // Obtain original values
             jointAxis = closestJoint.axis;
+            jointLowXLimit = -closestJoint.lowAngularXLimit.limit;
             jointHighXLimit = closestJoint.highAngularXLimit.limit;
-            jointLowXLimit = closestJoint.lowAngularXLimit.limit;
             jointYLimit = closestJoint.angularYLimit.limit;
             jointZLimit = closestJoint.angularZLimit.limit;
             
@@ -320,24 +342,21 @@ namespace Gann4Games.RagdollFactory
             {
                 case ComponentType.Capsule:
                     CreateCapsuleCollider(selectedBoneA, selectedBoneB);
-                    LastSelectedCollider = _selectedCapsuleCollider;
-                    _componentHistory.Add(_selectedCapsuleCollider);
                     break;
                 case ComponentType.Box:
                     CreateBoxCollider(selectedBoneA, selectedBoneB);
-                    LastSelectedCollider = _selectedBoxCollider;
-                    _componentHistory.Add(_selectedBoxCollider);
                     break;
                 case ComponentType.ConfigurableJoint:
                     CreateOrSelectConfigurableJoint(selectedBoneA, selectedBoneB);
-                    // LastSelectedJoint = _selectedConfigurableJoint;
-                    // LastSelectedRigidbody = blablabal
-                    _componentHistory.Add(LastSelectedRigidbody);
-                    _componentHistory.Add(LastSelectedJoint);
+                    break;
+                case ComponentType.Rigidbody:
+                    CreateRigidbody(selectedBoneB);
                     break;
             }
             DeselectBones();
         }
+
+        
 
         #region Component creation
         private T GetOrAddComponent<T>(GameObject target) where T : Component
@@ -350,6 +369,19 @@ namespace Gann4Games.RagdollFactory
             return comp;
         }
 
+        private void CreateRigidbody(Transform obj)
+        {
+            Rigidbody rb = GetOrAddComponent<Rigidbody>(obj.gameObject);
+            LastSelectedRigidbody = rb;
+            LastSelectedRigidbody.mass = rigidbodyMass;
+            LastSelectedRigidbody.drag = rigidbodyDrag;
+            LastSelectedRigidbody.angularDrag = rigidbodyAngularDrag;
+            LastSelectedRigidbody.useGravity = rigidbodyUseGravity;
+            LastSelectedRigidbody.isKinematic = rigidbodyIsKinematic;
+                
+            _componentHistory.Add(rb);
+        }
+        
         private void CreateOrSelectConfigurableJoint(Transform objA, Transform objB)
         {
             if (!objB.IsChildOf(objA))
@@ -369,6 +401,12 @@ namespace Gann4Games.RagdollFactory
             LastSelectedJoint.angularXMotion = ConfigurableJointMotion.Limited;
             LastSelectedJoint.angularYMotion = ConfigurableJointMotion.Limited;
             LastSelectedJoint.angularZMotion = ConfigurableJointMotion.Limited;
+            
+            LastSelectedJoint.axis = jointAxis;
+            LastSelectedJoint.lowAngularXLimit = new SoftJointLimit() {limit = -jointLowXLimit};
+            LastSelectedJoint.highAngularXLimit = new SoftJointLimit() {limit = jointHighXLimit};
+            LastSelectedJoint.angularYLimit = new SoftJointLimit() {limit = jointYLimit};
+            LastSelectedJoint.angularZLimit = new SoftJointLimit() {limit = jointZLimit};
 
             _componentHistory.Add(joint);
             _componentHistory.Add(rigidbodyB);
@@ -397,6 +435,9 @@ namespace Gann4Games.RagdollFactory
             
             Undo.RegisterCreatedObjectUndo(collisionObject, "Created Capsule Collider Object");
             Undo.RegisterCompleteObjectUndo(this, "Created Capsule Collider Object");
+            
+            LastSelectedCollider = _selectedCapsuleCollider;
+            _componentHistory.Add(_selectedCapsuleCollider);
         }
 
         private void CreateBoxCollider(Transform objA, Transform objB)
@@ -419,6 +460,10 @@ namespace Gann4Games.RagdollFactory
             
             Undo.RegisterCreatedObjectUndo(collisionObject, "Created Box Collider Object");
             Undo.RegisterCompleteObjectUndo(this, "Created Box Collider Object");
+            
+            
+            LastSelectedCollider = _selectedBoxCollider;
+            _componentHistory.Add(_selectedBoxCollider);
         }
         #endregion
 
@@ -515,15 +560,6 @@ namespace Gann4Games.RagdollFactory
         public void DeleteSelectedCollider()
         {
             TryDeleteObject(LastSelectedCollider);
-            // try
-            // {
-            //     DeleteObject(LastSelectedCollider.gameObject);
-            // }
-            // catch (InvalidOperationException e)
-            // {
-            //     Debug.LogWarning("UNABLE TO DELETE GAMEOBJECT! Removing component instead.\nMore information:\n" + e);
-            //     DeleteComponent(LastSelectedCollider);   
-            // }
         }
         
         public void DeleteLastComponent()
@@ -567,6 +603,18 @@ namespace Gann4Games.RagdollFactory
             ValidateCapsuleColliderValues();
             ValidateBoxColliderValues();
             ValidateJointValues();
+            ValidateRigidbodyValues();
+        }
+
+        private void ValidateRigidbodyValues()
+        {
+            if (!LastSelectedRigidbody) return;
+
+            LastSelectedRigidbody.mass = rigidbodyMass;
+            LastSelectedRigidbody.drag = rigidbodyDrag;
+            LastSelectedRigidbody.angularDrag = rigidbodyAngularDrag;
+            LastSelectedRigidbody.useGravity = rigidbodyUseGravity;
+            LastSelectedRigidbody.isKinematic = rigidbodyIsKinematic;
         }
 
         private void ValidateJointValues()

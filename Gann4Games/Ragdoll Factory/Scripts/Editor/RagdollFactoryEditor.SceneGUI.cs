@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Gann4Games.RagdollFactory
 {
@@ -31,6 +32,11 @@ namespace Gann4Games.RagdollFactory
                         case RagdollFactory.ComponentType.ConfigurableJoint:
                             DrawSelectableBones();
                             DrawJointHierarchy();
+                            DrawSelectableJoints();
+                            break;
+                        case RagdollFactory.ComponentType.Rigidbody:
+                            DrawSelectableBones();
+                            DrawSelectableRigidbodies();
                             break;
                     }
                     break;
@@ -60,6 +66,9 @@ namespace Gann4Games.RagdollFactory
                     DrawSelectableJoints();
                     DrawJointHierarchy();
                     break;
+                case RagdollFactory.ComponentType.Rigidbody:
+                    DrawSelectableRigidbodies();
+                    break;
             }
         }
         
@@ -74,6 +83,28 @@ namespace Gann4Games.RagdollFactory
                 _target.DeselectBones();
         }
 
+        private void DrawSelectableRigidbodies()
+        {
+            foreach (Rigidbody rb in _target.Rigidbodies)
+            {
+                Transform rbTransform = rb.transform;
+                Vector3 position = rbTransform.position;
+                
+                bool isHighlighted = _target.IsCursorLookingAt(rbTransform);
+                bool isSelected = _target.IsRigidbodySelected(rb);
+
+                string kinematicLabel = rb.isKinematic ? "KINEMATIC" : "DYNAMIC";
+                Color kinematicColor = Color.cyan * _target.normalColor;
+                
+                Handles.color = isHighlighted ? _target.selectedColor : _target.normalColor;
+                Handles.color = rb.isKinematic ? kinematicColor : Handles.color;
+                Handles.color = isSelected ? _target.selectedColor : Handles.color;
+
+                Handles.DrawSolidDisc(position, SceneView.currentDrawingSceneView.camera.transform.forward,
+                    _target.discRadius * rb.mass);
+            }
+        }
+        
         private void DrawSelectableJoints()
         {
             foreach (ConfigurableJoint joint in _target.Joints)
