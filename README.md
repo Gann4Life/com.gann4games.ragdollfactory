@@ -11,6 +11,10 @@ This version also seems to have a bug with the gizmos for colliders, so they mig
 * A window will appear asking you to import the package, click on `Import`.
 
 ## Usage
+1. Once imported, right click on your model.
+2. Look for `MrGann` tab and then click on `RagdollFactory`
+3. Begin creating with your preferred workflow.
+
 All tabs have three modes: `Create`, `Edit` and `Delete`. You can change between them with the buttons found in the inspector.
 
 ### Collision tabs (Capsule & Box)
