@@ -124,7 +124,8 @@ namespace Gann4Games.RagdollFactory
                 new(iconDelete, "Delete")
             };
             
-            _target.componentType = (RagdollFactory.ComponentType)GUILayout.Toolbar((int)_target.componentType, componentTabs);
+             _target.componentType = (RagdollFactory.ComponentType)GUILayout.Toolbar((int)_target.componentType, componentTabs);
+             _target.SetState(_target.States[(int)_target.componentType]);
             _target.actionTypeOnClick = (RagdollFactory.ActionTypeOnClick)GUILayout.Toolbar((int)_target.actionTypeOnClick, actionTypeTabs);
             
             GUILayout.Space(15);
@@ -158,7 +159,7 @@ namespace Gann4Games.RagdollFactory
             EditorGUILayout.PropertyField(_rigidbodyIsKinematic);
             
             if(GUILayout.Button("Delete Rigidbody"))
-                _target.DeleteSelectedRigidbody();
+                _target.CurrentComponent.Delete(); //.DeleteSelectedRigidbody();
         }
         private void DrawJointProperties()
         {
@@ -169,7 +170,7 @@ namespace Gann4Games.RagdollFactory
             EditorGUILayout.PropertyField(_jointZAngle);
 
             if (GUILayout.Button("Delete Joint"))
-                _target.DeleteSelectedJoint();
+                _target.CurrentComponent.Delete();//.DeleteSelectedJoint();
         }
         private void DrawCapsuleColliderProperties()
         {
@@ -178,9 +179,9 @@ namespace Gann4Games.RagdollFactory
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Convert to Box Collider"))
-                _target.ConvertSelectedColliderToBox();
-            if (_target.LastSelectedCollider && GUILayout.Button("Delete"))
-                _target.DeleteSelectedCollider();
+                _target.CurrentComponent.ConvertTo(new BoxCollider());//.ConvertSelectedColliderToBox();
+            if (GUILayout.Button("Delete"))
+                _target.CurrentComponent.Delete();//.DeleteSelectedCollider();
             EditorGUILayout.EndHorizontal();
         }
         private void DrawBoxColliderProperties()
@@ -191,9 +192,9 @@ namespace Gann4Games.RagdollFactory
             
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Convert to Capsule Collider"))
-                _target.ConvertSelectedColliderToCapsule();
+                _target.CurrentComponent.ConvertTo(new CapsuleCollider());//.ConvertSelectedColliderToCapsule();
             if (GUILayout.Button("Delete"))
-                _target.DeleteSelectedCollider();
+                _target.CurrentComponent.Delete();//.DeleteSelectedCollider();
             EditorGUILayout.EndHorizontal();
         }
         #endregion
