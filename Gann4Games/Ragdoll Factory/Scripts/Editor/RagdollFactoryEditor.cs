@@ -135,6 +135,7 @@ namespace Gann4Games.RagdollFactory
         #region Property Drawing
         private void DrawCurrentComponentProperties()
         {
+            if(!_target.CurrentComponent.HasComponentSelected) return;
             switch (_target.componentType)
             {
                 case RagdollFactory.ComponentType.Capsule:

@@ -18,6 +18,8 @@ namespace Gann4Games.RagdollFactory.States
         {
             return SelectedComponent == component;
         }
+
+        public bool HasComponentSelected => SelectedComponent != null;
         
         public RFComponentState(RagdollFactory context)
         {
@@ -64,6 +66,7 @@ namespace Gann4Games.RagdollFactory.States
                 ComponentList.Add(component);
             
             SelectedComponent = component;
+            EditorGUIUtility.PingObject(SelectedComponent);
         }
 
         public virtual void Deselect()

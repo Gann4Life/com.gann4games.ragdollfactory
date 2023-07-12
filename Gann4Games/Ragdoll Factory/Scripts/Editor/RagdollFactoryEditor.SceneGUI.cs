@@ -52,7 +52,7 @@ namespace Gann4Games.RagdollFactory
                     bone.position, 
                     SceneView.currentDrawingSceneView.camera.transform.rotation, 
                     _target.discRadius, 
-                    _target.discRadius*2, 
+                    _target.discRadius, 
                     Handles.CircleHandleCap       
                     );
                 

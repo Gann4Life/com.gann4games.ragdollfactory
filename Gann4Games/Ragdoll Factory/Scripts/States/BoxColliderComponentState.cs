@@ -9,7 +9,7 @@ namespace Gann4Games.RagdollFactory.States
     {
         private bool Pressed(BoxCollider col)
         {
-            var size = Mathf.Max(col.size.x, col.size.y);
+            var size = Mathf.Max(col.size.x, col.size.y) * 0.7f;
             return Handles.Button(
                 col.transform.position, 
                 col.transform.rotation, 

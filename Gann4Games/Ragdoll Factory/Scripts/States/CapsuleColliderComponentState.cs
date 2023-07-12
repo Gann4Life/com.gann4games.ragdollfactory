@@ -9,7 +9,7 @@ namespace Gann4Games.RagdollFactory.States
     {
         private bool Pressed(CapsuleCollider col)
         {
-            var size = col.radius*2;
+            var size = col.radius*1.2f;
             return Handles.Button(
                 col.transform.position, 
                 col.transform.rotation, 
