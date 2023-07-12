@@ -1,3 +1,4 @@
+using Gann4Games.RagdollFactory.States;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -124,7 +125,7 @@ namespace Gann4Games.RagdollFactory
                 new(iconDelete, "Delete")
             };
             
-             _target.componentType = (RagdollFactory.ComponentType)GUILayout.Toolbar((int)_target.componentType, componentTabs);
+             _target.componentType = (RagdollFactory.ComponentType)GUILayout.Toolbar((int)_target.CurrentStateIndex(), componentTabs);
              _target.SetState(_target.States[(int)_target.componentType]);
             _target.actionTypeOnClick = (RagdollFactory.ActionTypeOnClick)GUILayout.Toolbar((int)_target.actionTypeOnClick, actionTypeTabs);
             
@@ -152,6 +153,8 @@ namespace Gann4Games.RagdollFactory
         }
         private void DrawRigidbodyProperties()
         {
+            if(!(_target.CurrentComponent is RigidbodyComponentState)) return;
+            
             EditorGUILayout.PropertyField(_rigidbodyMass);
             EditorGUILayout.PropertyField(_rigidbodyDrag);
             EditorGUILayout.PropertyField(_rigidbodyAngularDrag);
@@ -163,6 +166,8 @@ namespace Gann4Games.RagdollFactory
         }
         private void DrawJointProperties()
         {
+            if(!(_target.CurrentComponent is ConfigurableJointComponentState)) return;
+            
             EditorGUILayout.PropertyField(_jointAxis);
             EditorGUILayout.PropertyField(_jointLowXLimit);
             EditorGUILayout.PropertyField(_jointHighXLimit);
@@ -174,6 +179,8 @@ namespace Gann4Games.RagdollFactory
         }
         private void DrawCapsuleColliderProperties()
         {
+            if(!(_target.CurrentComponent is CapsuleColliderComponentState)) return;
+            
             EditorGUILayout.PropertyField(_capsuleLength);
             EditorGUILayout.PropertyField(_capsuleRadius);
 
@@ -186,6 +193,8 @@ namespace Gann4Games.RagdollFactory
         }
         private void DrawBoxColliderProperties()
         {
+            if(!(_target.CurrentComponent is BoxColliderComponentState)) return;
+            
             EditorGUILayout.PropertyField(_boxLength);
             EditorGUILayout.PropertyField(_boxWidth);
             EditorGUILayout.PropertyField(_boxDepth);

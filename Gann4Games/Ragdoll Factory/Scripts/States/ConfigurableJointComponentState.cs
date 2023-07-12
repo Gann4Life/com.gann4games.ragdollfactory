@@ -73,10 +73,12 @@ namespace Gann4Games.RagdollFactory.States
             throw new System.NotImplementedException();
         }
 
-        public override void DrawGUI()
+        public override void DrawSceneGUI()
         {
             foreach (ConfigurableJoint joint in ComponentList.ToArray())
             {
+                if (!joint) continue;
+                
                 if(IsSelected(joint)) DisplayJointHandles(joint);
                 else VisualizeJointLimits(joint);
                 
@@ -92,10 +94,7 @@ namespace Gann4Games.RagdollFactory.States
                     case RagdollFactory.ActionTypeOnClick.Delete:
                         DisplayJointStatus(joint);
                         if (Pressed(joint))
-                        {
-                            Select(joint);
-                            Delete();
-                        }
+                            Delete(joint);
                         break;
                 }
             }
@@ -115,8 +114,6 @@ namespace Gann4Games.RagdollFactory.States
         
         private void DisplayJointHandles(ConfigurableJoint joint)
         {
-            if (!joint) return;
-            
             Vector3 normalXDirection = joint.transform.TransformDirection(joint.axis);
             Vector3 fromXDirection = Vector3.Cross(joint.transform.TransformDirection(joint.axis), joint.transform.up);
 
@@ -126,7 +123,7 @@ namespace Gann4Games.RagdollFactory.States
             Vector3 normalZDirection = joint.transform.TransformDirection(Vector3.Cross(joint.axis, -Vector3.up));
             Vector3 fromZDirection = Vector3.Cross(joint.transform.TransformDirection(joint.axis), normalZDirection);
             
-            // Load arc values
+            // Load arc values from inspector
             arcHandleXLow.angle = Context.jointLowXLimit;
             arcHandleXHigh.angle = -Context.jointHighXLimit;
             arcHandleY.angle = Context.jointYLimit;
@@ -179,15 +176,14 @@ namespace Gann4Games.RagdollFactory.States
             // Dispose values to arc handles with clamped values
             Context.jointLowXLimit = Mathf.Clamp(arcHandleXLow.angle, 0, 180);
             Context.jointHighXLimit = Mathf.Clamp(-arcHandleXHigh.angle, 0, 180);
-            Context.jointYLimit = Mathf.Clamp(arcHandleY.angle, 0, 180);
-            Context.jointZLimit = Mathf.Clamp(arcHandleZ.angle, 0, 180);
+            // By using the absolute values we guarantee that the handle can be used in both directions
+            Context.jointYLimit = Mathf.Clamp(Mathf.Abs(arcHandleY.angle), 0, 180);
+            Context.jointZLimit = Mathf.Clamp(Mathf.Abs(arcHandleZ.angle), 0, 180);
 
             Update();
         }
         private void VisualizeJointLimits(ConfigurableJoint joint, float radius = 0.1f, float opacity = 0.25f)
         {
-            if (!joint) return;
-
             Vector3 normalXDirection = joint.transform.TransformDirection(joint.axis);
             Vector3 fromXDirection = Vector3.Cross(joint.transform.TransformDirection(joint.axis), joint.transform.up);
 
@@ -268,7 +264,8 @@ namespace Gann4Games.RagdollFactory.States
 
         public override void Delete()
         {
-            Undo.DestroyObjectImmediate(SelectedComponent.gameObject.GetComponent<Rigidbody>());
+            Rigidbody rb = SelectedComponent.gameObject.GetComponent<Rigidbody>();
+            Context.RigidbodyComponentState.Delete(rb);
             base.Delete();
         }
     }

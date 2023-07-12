@@ -14,7 +14,7 @@ namespace Gann4Games.RagdollFactory
 
             CheckForInput();
 
-            _target.CurrentComponent.DrawGUI();
+            _target.CurrentComponent.DrawSceneGUI();
             switch (_target.actionTypeOnClick)
             {
                 case RagdollFactory.ActionTypeOnClick.Create:

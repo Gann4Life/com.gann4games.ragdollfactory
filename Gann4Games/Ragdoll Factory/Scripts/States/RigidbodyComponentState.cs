@@ -35,10 +35,12 @@ namespace Gann4Games.RagdollFactory.States
             throw new System.NotImplementedException();
         }
 
-        public override void DrawGUI()
+        public override void DrawSceneGUI()
         {
             foreach(Rigidbody rb in ComponentList.ToArray())
             {
+                if(!rb) continue;
+                
                 Handles.color = Context.normalColor * (rb.isKinematic ? Color.red : Color.green);
                 Handles.color = IsSelected(rb) ? Context.selectedColor : Handles.color;
 
@@ -56,10 +58,7 @@ namespace Gann4Games.RagdollFactory.States
                         break;
                     case RagdollFactory.ActionTypeOnClick.Delete:
                         if (Pressed(rb))
-                        {
-                            Select(rb);
-                            Delete();
-                        }
+                            Delete(rb);
                         break;
                 }
             }

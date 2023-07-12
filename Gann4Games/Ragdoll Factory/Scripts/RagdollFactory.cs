@@ -69,7 +69,22 @@ namespace Gann4Games.RagdollFactory
             Capsule, Box, ConfigurableJoint, Rigidbody
         }
 
-        public void SetState(RFComponentState state) => CurrentComponent = state;
+        public void SetState(RFComponentState state)
+        {
+            CurrentComponent = state;
+        }
+        
+        /// <summary>
+        /// Returns the index of a state
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private int GetStateIndex(RFComponentState state) => Array.IndexOf(States, state);
+
+        /// <summary>
+        /// Returns the current state as an integer
+        /// </summary>
+        public int CurrentStateIndex() => GetStateIndex(CurrentComponent);
 
         public void DeselectBones()
         {
@@ -79,7 +94,7 @@ namespace Gann4Games.RagdollFactory
 
         private void OnValidate()
         {
-            CurrentComponent.Update();
+            CurrentComponent?.Update();
         }
 
         private void OnEnable()

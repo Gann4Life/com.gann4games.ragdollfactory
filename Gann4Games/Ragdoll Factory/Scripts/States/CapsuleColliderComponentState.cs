@@ -9,12 +9,13 @@ namespace Gann4Games.RagdollFactory.States
     {
         private bool Pressed(CapsuleCollider col)
         {
+            var size = col.radius*2;
             return Handles.Button(
                 col.transform.position, 
-                Quaternion.identity, 
-                col.radius, 
-                0.1f, 
-                Handles.SphereHandleCap
+                col.transform.rotation, 
+                size, 
+                size, 
+                Handles.CircleHandleCap
             );
         }
         
@@ -73,24 +74,27 @@ namespace Gann4Games.RagdollFactory.States
                 boxCollider.center = Vector3.forward * height;
                 boxCollider.size = new Vector3(radius, radius, distance);
                 
-                Context.BoxColliderComponentState.Select(boxCollider);
-            
                 Undo.RegisterCompleteObjectUndo(collisionObject, "Converted Capsule Collider to Box Collider");
-
+                
                 Context.SetState(Context.BoxColliderComponentState);
+                Context.BoxColliderComponentState.Select(boxCollider);
             }
         }
 
-        public override void DrawGUI()
+        public override void DrawSceneGUI()
         {
             foreach(CapsuleCollider collider in ComponentList.ToArray())
             {
                 if (!collider) continue;
-                Handles.color = IsSelected(collider) ? Context.selectedColor : Context.normalColor;
+                Handles.color = Color.white;
 
-                if(IsSelected(collider))
-                    collider.transform.position = Handles.PositionHandle(collider.transform.position, collider.transform.rotation);
-                
+                if (IsSelected(collider))
+                {
+                    Undo.RecordObject(collider.transform, "Moved Capsule Collider");
+                    collider.transform.position =
+                        Handles.PositionHandle(collider.transform.position, collider.transform.rotation);
+                }
+
                 switch (Context.actionTypeOnClick)
                 {
                     case RagdollFactory.ActionTypeOnClick.Select:
@@ -99,10 +103,7 @@ namespace Gann4Games.RagdollFactory.States
                         break;
                     case RagdollFactory.ActionTypeOnClick.Delete:
                         if (Pressed(collider))
-                        {
-                            Select(collider);
-                            Delete();
-                        }
+                            Delete(collider);
                         break;
                 }
             }

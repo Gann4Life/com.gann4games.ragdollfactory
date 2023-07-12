@@ -24,11 +24,9 @@ namespace Gann4Games.RagdollFactory.States
             Context = context;
         }
 
+        #region Actions
         public abstract void Create();
-        public abstract void ConvertTo(Component component);
-        public abstract void DrawGUI();
-        public abstract void Update();
-
+        
         /// <summary>
         /// Deletes the selected component and removes it from the history.
         /// </summary>
@@ -37,7 +35,16 @@ namespace Gann4Games.RagdollFactory.States
             ComponentList.Remove(SelectedComponent);
             Undo.DestroyObjectImmediate(SelectedComponent);
         }
-
+        /// <summary>
+        /// Selects an element and then deletes it.
+        /// </summary>
+        /// <param name="component"></param>
+        public void Delete(Component component)
+        {
+            Select(component);
+            Delete();
+        }
+        
         /// <summary>
         /// Deletes the game object from the selected component and removes it from the history.
         /// </summary>
@@ -46,7 +53,7 @@ namespace Gann4Games.RagdollFactory.States
             ComponentList.Remove(SelectedComponent);
             Undo.DestroyObjectImmediate(SelectedComponent.gameObject);
         }
-
+        
         /// <summary>
         /// Selects the component, if it isn't on the history, add it.
         /// </summary>
@@ -63,6 +70,13 @@ namespace Gann4Games.RagdollFactory.States
         {
             SelectedComponent = null;
         }
+        
+        public abstract void ConvertTo(Component component);
+        #endregion
+        
+        public abstract void Update();
+
+        public abstract void DrawSceneGUI();
         
         protected T GetOrAddComponent<T>(GameObject target) where T : Component
         {
