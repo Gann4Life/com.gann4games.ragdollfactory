@@ -37,6 +37,7 @@ namespace Gann4Games.RagdollFactory.States
             ComponentList.Remove(SelectedComponent);
             Undo.DestroyObjectImmediate(SelectedComponent);
         }
+        
         /// <summary>
         /// Selects an element and then deletes it.
         /// </summary>
@@ -45,6 +46,12 @@ namespace Gann4Games.RagdollFactory.States
         {
             Select(component);
             Delete();
+        }
+
+        public void DeleteAll()
+        {
+            while (ComponentList.Count > 0)
+                Delete(ComponentList[0]);
         }
         
         /// <summary>

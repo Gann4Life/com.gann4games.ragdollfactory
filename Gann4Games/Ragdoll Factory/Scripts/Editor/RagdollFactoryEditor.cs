@@ -67,7 +67,6 @@ namespace Gann4Games.RagdollFactory
 
         private void LoadButtonIcons()
         {
-            int iconSize = 5;
             iconAdd = EditorGUIUtility.Load(iconAddPath) as Texture2D;
             iconSelect = EditorGUIUtility.Load(iconSelectPath) as Texture2D;
             iconDelete = EditorGUIUtility.Load(iconDeletePath) as Texture2D;
@@ -107,6 +106,7 @@ namespace Gann4Games.RagdollFactory
             serializedObject.Update();
             DrawInspectorTabs();
             DrawCurrentComponentProperties();
+            DrawActionButtons();
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -154,61 +154,60 @@ namespace Gann4Games.RagdollFactory
         }
         private void DrawRigidbodyProperties()
         {
-            if(!(_target.CurrentComponent is RigidbodyComponentState)) return;
+            // if(!(_target.CurrentComponent is RigidbodyComponentState)) return;
             
             EditorGUILayout.PropertyField(_rigidbodyMass);
             EditorGUILayout.PropertyField(_rigidbodyDrag);
             EditorGUILayout.PropertyField(_rigidbodyAngularDrag);
             EditorGUILayout.PropertyField(_rigidbodyUseGravity);
             EditorGUILayout.PropertyField(_rigidbodyIsKinematic);
-            
-            if(GUILayout.Button("Delete Rigidbody"))
-                _target.CurrentComponent.Delete(); //.DeleteSelectedRigidbody();
         }
         private void DrawJointProperties()
         {
-            if(!(_target.CurrentComponent is ConfigurableJointComponentState)) return;
+            // if(!(_target.CurrentComponent is ConfigurableJointComponentState)) return;
             
             EditorGUILayout.PropertyField(_jointAxis);
             EditorGUILayout.PropertyField(_jointLowXLimit);
             EditorGUILayout.PropertyField(_jointHighXLimit);
             EditorGUILayout.PropertyField(_jointYLimit);
             EditorGUILayout.PropertyField(_jointZAngle);
-
-            if (GUILayout.Button("Delete Joint"))
-                _target.CurrentComponent.Delete();//.DeleteSelectedJoint();
         }
         private void DrawCapsuleColliderProperties()
         {
-            if(!(_target.CurrentComponent is CapsuleColliderComponentState)) return;
+            // if(!(_target.CurrentComponent is CapsuleColliderComponentState)) return;
             
             EditorGUILayout.PropertyField(_capsuleLength);
             EditorGUILayout.PropertyField(_capsuleRadius);
-
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Convert to Box Collider"))
-                _target.CurrentComponent.ConvertTo(new BoxCollider());//.ConvertSelectedColliderToBox();
-            if (GUILayout.Button("Delete"))
-                _target.CurrentComponent.Delete();//.DeleteSelectedCollider();
-            EditorGUILayout.EndHorizontal();
         }
         private void DrawBoxColliderProperties()
         {
-            if(!(_target.CurrentComponent is BoxColliderComponentState)) return;
+            // if(!(_target.CurrentComponent is BoxColliderComponentState)) return;
             
             EditorGUILayout.PropertyField(_boxLength);
             EditorGUILayout.PropertyField(_boxWidth);
             EditorGUILayout.PropertyField(_boxDepth);
-            
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Convert to Capsule Collider"))
-                _target.CurrentComponent.ConvertTo(new CapsuleCollider());//.ConvertSelectedColliderToCapsule();
-            if (GUILayout.Button("Delete"))
-                _target.CurrentComponent.Delete();//.DeleteSelectedCollider();
-            EditorGUILayout.EndHorizontal();
         }
         #endregion
 
+        private void DrawActionButtons()
+        {
+            bool hasSelection = _target.CurrentComponent.HasComponentSelected;
+            bool isCapsule = _target.CurrentComponent is CapsuleColliderComponentState && hasSelection;
+            bool isBox = _target.CurrentComponent is BoxColliderComponentState && hasSelection;
+            
+            if (isBox && GUILayout.Button("Convert to Capsule Collider"))
+                _target.CurrentComponent.ConvertTo(new CapsuleCollider());//.ConvertSelectedColliderToCapsule();
+            if (isCapsule && GUILayout.Button("Convert to Box Collider"))
+                _target.CurrentComponent.ConvertTo(new BoxCollider());//.ConvertSelectedColliderToBox();
+
+            EditorGUILayout.BeginHorizontal();
+            if(GUILayout.Button("Delete All"))
+                _target.CurrentComponent.DeleteAll();
+            if (hasSelection && GUILayout.Button("Delete Selected"))
+                _target.CurrentComponent.Delete();
+            EditorGUILayout.EndHorizontal();
+        }
+        
         /// <summary>
         /// Shows relevant information about how to perfom a specific action in the choosen tool/button/mode
         /// </summary>
