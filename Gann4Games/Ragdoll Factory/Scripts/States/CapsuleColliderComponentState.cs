@@ -32,13 +32,13 @@ namespace Gann4Games.RagdollFactory.States
             //     throw new Exception("The second bone must be child of the first bone!");
             
             float distance = Vector3.Distance(objA.position, objB.position);
-            
+
             GameObject collisionObject = new GameObject(objA.name + " - " + objB.name);
             collisionObject.transform.SetParent(objA);
             collisionObject.transform.localPosition = Vector3.zero;
             collisionObject.transform.forward = objB.position - objA.position;
             collisionObject.transform.localScale = Vector3.one;
-            CapsuleCollider selectedCapsuleCollider = Undo.AddComponent<CapsuleCollider>(collisionObject);
+            CapsuleCollider selectedCapsuleCollider = collisionObject.AddComponent<CapsuleCollider>();
             selectedCapsuleCollider.direction = 2;
             selectedCapsuleCollider.radius = Context.capsuleColliderRadius;
             selectedCapsuleCollider.center = Vector3.forward * distance / 2;
@@ -46,9 +46,9 @@ namespace Gann4Games.RagdollFactory.States
             
             Context.capsuleColliderLength = distance;
             
-            Undo.RegisterCompleteObjectUndo(Context, "Created Capsule Collider Object");
-            
+            Undo.RegisterCreatedObjectUndo(collisionObject, "Created Capsule Collider Object");
             Select(selectedCapsuleCollider);
+            Undo.RegisterCompleteObjectUndo(Context, "Created Capsule Collider Object");
         }
 
         public override void ConvertTo(Component component)

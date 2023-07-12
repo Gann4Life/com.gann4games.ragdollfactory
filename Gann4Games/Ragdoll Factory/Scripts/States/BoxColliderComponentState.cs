@@ -35,17 +35,15 @@ namespace Gann4Games.RagdollFactory.States
             collisionObject.transform.localPosition = Vector3.zero;
             collisionObject.transform.forward = objB.position - objA.position;
             collisionObject.transform.localScale = Vector3.one;
-            BoxCollider _selectedBoxCollider = Undo.AddComponent<BoxCollider>(collisionObject);
+            BoxCollider _selectedBoxCollider = collisionObject.AddComponent<BoxCollider>();
             _selectedBoxCollider.center = Vector3.forward * height;
             _selectedBoxCollider.size = new Vector3(Context.boxColliderWidth, Context.boxColliderDepth, distance);
             
             Context.boxColliderLength = height;
             
             Undo.RegisterCreatedObjectUndo(collisionObject, "Created Box Collider Object");
-            Undo.RegisterCompleteObjectUndo(Context, "Created Box Collider Object");
-
-
             Select(_selectedBoxCollider);
+            Undo.RegisterCompleteObjectUndo(Context, "Created Box Collider Object");
         }
 
         public override void ConvertTo(Component component)
