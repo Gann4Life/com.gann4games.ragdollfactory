@@ -60,7 +60,15 @@ namespace Gann4Games.RagdollFactory.States
         public virtual void DeleteSelectedGameObject()
         {
             ComponentList.Remove(SelectedComponent);
-            Undo.DestroyObjectImmediate(SelectedComponent.gameObject);
+            try
+            {
+                Undo.DestroyObjectImmediate(SelectedComponent.gameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                Debug.LogWarning("UNABLE TO DELETE COLLIDER, DELETING COMPONENT INSTEAD (Are you trying to delete a collider attached to a model's bone?)\nERROR: " + e.Message);
+                Undo.DestroyObjectImmediate(SelectedComponent);
+            }
         }
         
         /// <summary>
