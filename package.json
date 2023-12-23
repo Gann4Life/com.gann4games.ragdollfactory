@@ -1,0 +1,13 @@
+{
+    "name": "com.gann4games.ragdollfactory",
+    "version": "0.2.1",
+    "displayName": "RagdollFactory",
+    "description": "A tool to create and modify ragdolls",
+    "unity": "2022.3",
+    "unityRelease": "4f1",
+    "changelogUrl": "https://github.com/Gann4Life/RagdollFactory/commits/main/",
+    "author": {
+      "name": "Gann4Life",
+      "url": "https://github.com/gann4life"
+    }
+  }
