@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -270,3 +271,4 @@ namespace Gann4Games.RagdollFactory.States
         }
     }
 }
+#endif

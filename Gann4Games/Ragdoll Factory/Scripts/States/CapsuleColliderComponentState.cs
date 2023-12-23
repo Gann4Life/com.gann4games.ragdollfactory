@@ -1,4 +1,4 @@
-﻿using System;
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -34,6 +34,7 @@ namespace Gann4Games.RagdollFactory.States
             float distance = Vector3.Distance(objA.position, objB.position);
 
             GameObject collisionObject = new GameObject(objA.name + " - " + objB.name);
+            collisionObject.layer = Context.gameObject.layer;
             collisionObject.transform.SetParent(objA);
             collisionObject.transform.localPosition = Vector3.zero;
             collisionObject.transform.forward = objB.position - objA.position;
@@ -133,3 +134,4 @@ namespace Gann4Games.RagdollFactory.States
         public override void Delete() => DeleteSelectedGameObject();
     }
 }
+#endif

@@ -1,7 +1,7 @@
-﻿using Gann4Games.RagdollFactory.States;
+﻿#if UNITY_EDITOR
+using Gann4Games.RagdollFactory.States;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Gann4Games.RagdollFactory
 {
@@ -73,3 +73,4 @@ namespace Gann4Games.RagdollFactory
         }
     }
 }
+#endif

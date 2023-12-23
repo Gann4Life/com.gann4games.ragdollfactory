@@ -1,22 +1,38 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 namespace Gann4Games.RagdollFactory.States
 {
+    
     public class RigidbodyComponentState : RFComponentState
     {
         private bool Pressed(Rigidbody rb)
         {
+            // return Handles.Button(
+            //     rb.transform.position, 
+            //     SceneView.currentDrawingSceneView.camera.transform.rotation,
+            //     rb.mass * Context.discRadius, 
+            //     rb.mass * Context.discRadius, 
+            //     Handles.DotHandleCap
+            // );
+            
+            Handles.DrawSolidDisc(
+                rb.transform.position,
+                SceneView.currentDrawingSceneView.camera.transform.forward,
+                rb.mass * Context.discRadius);
+            
             return Handles.Button(
-                rb.transform.position, 
+                rb.transform.position,
                 SceneView.currentDrawingSceneView.camera.transform.rotation,
-                rb.mass * Context.discRadius, 
-                rb.mass * Context.discRadius, 
-                Handles.DotHandleCap
-            );
+                rb.mass * Context.discRadius,
+                rb.mass * Context.discRadius,
+                Handles.CircleHandleCap
+                );
+            
         }
-        
+
         public RigidbodyComponentState(RagdollFactory components) : base(components)
         {
             ComponentList = new List<Component>();
@@ -37,9 +53,12 @@ namespace Gann4Games.RagdollFactory.States
 
         public override void DrawSceneGUI()
         {
+            Handles.DrawWireDisc(CenterOfMass(), SceneView.currentDrawingSceneView.camera.transform.forward, Context.discRadius * 2);
+
             foreach(Rigidbody rb in ComponentList.ToArray())
             {
                 if(!rb) continue;
+
                 
                 Handles.color = Context.normalColor * (rb.isKinematic ? Color.red : Color.green);
                 Handles.color = IsSelected(rb) ? Context.selectedColor : Handles.color;
@@ -86,5 +105,25 @@ namespace Gann4Games.RagdollFactory.States
             Context.rigidbodyUseGravity = rb.useGravity;
             Context.rigidbodyIsKinematic = rb.isKinematic;
         }
+
+        /// <summary>
+        /// Returns the center of mass based on all current rigidbodies.
+        /// </summary>
+        /// <returns></returns>
+        private Vector3 CenterOfMass()
+        {
+            Vector3 CoM = Vector3.zero;
+            float mass = 0f;
+ 
+            foreach (Rigidbody part in ComponentList)
+            {
+                CoM += part.worldCenterOfMass * part.mass;
+                mass += part.mass;
+            }
+ 
+            CoM /= mass;
+            return CoM;
+        }
     }
 }
+#endif

@@ -1,9 +1,8 @@
+#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Gann4Games.RagdollFactory.States;
-using UnityEditor;
 
 namespace Gann4Games.RagdollFactory
 {
@@ -115,5 +114,4 @@ namespace Gann4Games.RagdollFactory
         }
     }
 }
-
-
+#endif
