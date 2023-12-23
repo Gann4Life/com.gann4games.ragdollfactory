@@ -1,4 +1,4 @@
-﻿using System;
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -132,3 +132,4 @@ namespace Gann4Games.RagdollFactory.States
         public override void Delete() => DeleteSelectedGameObject();
     }
 }
+#endif
