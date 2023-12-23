@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.IO;
 using Gann4Games.RagdollFactory.States;
 using UnityEditor;
 using UnityEngine;
@@ -40,13 +41,14 @@ namespace Gann4Games.RagdollFactory
         #endregion
 
         #region Icon paths
-        private string iconAddPath = "Assets/Gann4Games/Ragdoll Factory/Content/Icons/Actions/add.png";
-        private string iconSelectPath = "Assets/Gann4Games/Ragdoll Factory/Content/Icons/Actions/select.png";
-        private string iconDeletePath = "Assets/Gann4Games/Ragdoll Factory/Content/Icons/Actions/delete.png";
-        private string iconCapsulePath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/capsule.png";
-        private string iconBoxPath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/box.png";
-        private string iconJointPath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/joint.png";
-        private string iconRigidbodyPath ="Assets/Gann4Games/Ragdoll Factory/Content/Icons/Components/rigidbody.png";
+        private string contentPath => Path.Combine("Packages", "com.gann4games.ragdollfactory", "Content");
+        private string iconAddPath => Path.Combine(contentPath, "Icons/Actions/add.png");
+        private string iconSelectPath => Path.Combine(contentPath, "Icons/Actions/select.png");
+        private string iconDeletePath => Path.Combine(contentPath, "Icons/Actions/delete.png");
+        private string iconCapsulePath => Path.Combine(contentPath, "Icons/Components/capsule.png");
+        private string iconBoxPath => Path.Combine(contentPath, "Icons/Components/box.png");
+        private string iconJointPath => Path.Combine(contentPath, "Icons/Components/joint.png");
+        private string iconRigidbodyPath => Path.Combine(contentPath, "Icons/Components/rigidbody.png");
 
         private Texture2D iconAdd, iconSelect, iconDelete, iconCapsule, iconBox, iconJoint, iconRigidbody;
         #endregion
