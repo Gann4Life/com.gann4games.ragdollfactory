@@ -11,9 +11,11 @@ This version also seems to have a bug with the gizmos for colliders, so they mig
 * A window will appear asking you to import the package, click on `Import`.
 
 ## Usage
-1. Once imported, right click on your model.
-2. Look for `MrGann` tab and then click on `RagdollFactory`
+1. Once imported, select your model.
+2. Look for `Gann4Games` -> `Tools` -> `RagdollFactory` in the menu bar.
 3. Begin creating with your preferred workflow.
+
+You can delete the component once you're done, and add it again whenever you want to continue working on the ragdoll.
 
 All tabs have three modes: `Create`, `Edit` and `Delete`. You can change between them with the buttons found in the inspector.
 
