@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-    - release
+    - master
 jobs:
   release:
     name: release
@@ -17,6 +17,6 @@ jobs:
         extra_plugins: |
           @semantic-release/changelog
           @semantic-release/git
-        branch: release
+        branch: master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
