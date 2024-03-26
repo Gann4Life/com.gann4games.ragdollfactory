@@ -1,3 +1,6 @@
+# ⚠️ Repository moved to [Gann4Games](https://github.com/gann4games/com.gann4games.ragdollfactory)
+This repository is no longer maintained.
+
 # Ragdoll Factory
 A tool to create ragdolls easily in Unity by clicking on the bones you want to have rigidbodies, joints and collisions.
 You can build a complete ragdoll in under five minutes with this, useful if you use a lot of ragdolls and they also vary in shapes or anatomy.
